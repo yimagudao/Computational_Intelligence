@@ -9,15 +9,17 @@ import math
 import random
 
 class GA():
-    def __init__(self, length, count):
+    def __init__(self, length, count,mutation_rate=0.5):
         # 染色体长度
         self.length = length
         # 种群中的染色体数量
         self.count = count
+        #变异概率
+        self.mutation_rate = mutation_rate
         # 随机生成初始种群
         self.population = self.gen_population(length, count)
 
-    def evolve(self, retain_rate=0.2, random_select_rate=0.5, mutation_rate=0.01):
+    def evolve(self):
         """
         进化
         对当前一代种群依次进行选择、交叉并生成新一代种群，然后对新一代种群进行变异
@@ -29,7 +31,7 @@ class GA():
     def gen_chromosome(self, length):
         """
         随机生成长度为length的染色体，每个基因的取值是0或1
-        这里用一个bit表示一个基因
+        这里用一个字符表示一个基因
         """
         chromosome = ''
         for i in range(length):
@@ -81,11 +83,14 @@ class GA():
         resulCodes = []
         adaptiveValue = [0] * self.count
         for i in range(self.count) :
+            #每个基因的适应度值和种群的总适应度值
             adaptiveValue[i] = self.fitness(self.population[i])
             sumFitness += adaptiveValue[i]
         for i in range(self.count) :
+            #每个个体的适应度概率
             adaptiveValue[i] = adaptiveValue[i] /sumFitness
         for i in range(self.count):
+            #产生随机概率
             randomNum = random.randint(1,99)
             randomNum = randomNum /100
             sumFitness = 0
@@ -124,14 +129,15 @@ class GA():
     def mutation(self):
         """
         变异
-        对种群中的所有个体，随机改变个体中的某个基因
+        对种群中的所有个体，根据变异概率随机改变个体中的某个基因
         """
         
         for i in range(len(self.population)):
-            mutationPoint = random.randint(0,self.length-1)
-            newcode = list(self.population[i])
-            newcode[mutationPoint] = ('0' if newcode[mutationPoint]=='1' else '1')
-            self.population[i] = ''.join(newcode)
+            if random.random() < self.mutation_rate :
+                mutationPoint = random.randint(0,self.length-1)
+                newcode = list(self.population[i])
+                newcode[mutationPoint] = ('0' if newcode[mutationPoint]=='1' else '1')
+                self.population[i] = ''.join(newcode)
     
     def result(self) :
         """
@@ -143,15 +149,15 @@ class GA():
             if self.fitness(chromosome) > max:
                 max = self.fitness(chromosome)
                 lastCode = chromosome
-        print(max, lastCode)
+        print('每天获得最大利益为:%d,获得最大利益时基因编码为:%s'%(max,lastCode))
         str1 = lastCode[0:6]
         str2 = lastCode[6:]
         x1 = self.binaryArrayToNum(str1)
         x2 = self.binaryArrayToNum(str2)
-        print(x1,x2)
+        print('x1的值为:%d,x2的值为:%d'%(x1,x2))
         
 if __name__ == '__main__':
-    # 染色体长度为12， 种群数量为300
+    # 染色体长度为12， 种群数量为200
     ga = GA(12, 200)
     # 200次进化迭代
     for x in range(150):

@@ -128,5 +128,5 @@ if __name__ == '__main__':
     # 200次进化迭代
     for x in range(200):
          ga.evolve()
-
-    print (ga.result())
+         print(ga.result())
+#    print (ga.result())
